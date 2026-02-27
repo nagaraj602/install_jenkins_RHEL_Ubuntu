@@ -106,6 +106,10 @@ else
     exit 1
 fi
 
+echo "*******************************************************"
+echo
+echo
+echo
 echo "Access Jenkins at http://$(curl -s ifconfig.me):$port"
 
 
