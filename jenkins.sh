@@ -75,7 +75,7 @@ elif [ "$distro" == "ubuntu" ]; then
                 /etc/default/jenkins > /dev/null 2>&1
     sudo systemctl daemon-reload > /dev/null 2>&1
 
-    sudo apt update -y > /dev/null
+    sudo apt-get update -y > /dev/null
     sudo apt-get install wget -y > /dev/null
 
     sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
@@ -85,7 +85,7 @@ elif [ "$distro" == "ubuntu" ]; then
     https://pkg.jenkins.io/debian-stable binary/" | \
     sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
 
-    sudo apt update -y > /dev/null
+    
     sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
     sudo apt-get install jenkins -y > /dev/null
 
