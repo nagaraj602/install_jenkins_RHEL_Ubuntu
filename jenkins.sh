@@ -87,7 +87,7 @@ elif [ "$distro" == "ubuntu" ]; then
 
     sudo apt-get update -y > /dev/null
     sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
-    sudo apt install jenkins -y > /dev/null
+    sudo apt-get install jenkins -y > /dev/null
 
     # Modern systemd override for port (Ubuntu)
     sudo mkdir -p /etc/systemd/system/jenkins.service.d
