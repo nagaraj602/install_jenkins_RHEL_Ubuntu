@@ -1,9 +1,9 @@
 #!/bin/bash
 
-distro=$(grep "^ID=" /etc/os-release | cut -d "=" -f2 | tr -d '"')
+distro=$(cat /etc/os-release | grep "^ID=" | cut -d "=" -f2 | sed 's/"//g')
 
 echo "Please enter the port number which is not used by any other application:"
-read -t 30 port
+read -t 10 port
 
 # Function to check if port is free
 is_port_free() {
