@@ -2,5 +2,6 @@
 
 This script will install Jenkins on RHEL or Ubuntu machine by getting port number from user. You can use this below command to install Jenkins
 
-**cd; sudo yum install git -y > /dev/null; git clone https://github.com/nagaraj602/install_jenkins_RHEL_Ubuntu.git &> /dev/null; cd install_jenkins_RHEL_Ubuntu; bash jenkins.sh
+**cd; sudo yum install git -y > /dev/null; git clone https://github.com/nagaraj602/install_jenkins_RHEL_Ubuntu.git &> /dev/null; cd install_jenkins_RHEL_Ubuntu; bash jenkins.sh**
 
+—---------------------------------------------------------------------------------------------------------------------------- 
