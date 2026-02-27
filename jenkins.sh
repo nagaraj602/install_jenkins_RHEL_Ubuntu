@@ -72,8 +72,8 @@ elif [ "$distro" == "ubuntu" ]; then
 
     # FULL RESET
     sudo systemctl stop jenkins > /dev/null 2>&1
-    sudo NEEDRESTART_MODE=a apt-get purge jenkins -y & > /dev/null 2>&1
-    sudo NEEDRESTART_MODE=a apt-get autoremove -y & > /dev/null 2>&1
+    sudo apt-get purge jenkins -y & > /dev/null 2>&1
+    sudo apt-get autoremove -y & > /dev/null 2>&1
     sudo rm -rf /var/lib/jenkins \
                 /var/log/jenkins \
                 /etc/systemd/system/jenkins.service.d \
