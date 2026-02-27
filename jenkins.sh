@@ -2,6 +2,9 @@
 
 distro=$(cat /etc/os-release | grep "^ID=" | cut -d "=" -f2 | sed 's/"//g')
 
+echo
+echo
+echo
 echo "Please enter the port number which is not used by any other application:"
 read -t 15 port
 
