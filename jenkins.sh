@@ -39,7 +39,9 @@ if [ "$distro" == "rhel" ]; then
     sudo yum install jenkins -y > /dev/null
     
     # Update Jenkins port BEFORE starting
-    sudo sed -i "s/^JENKINS_PORT=.*/JENKINS_PORT=\"$port\"/" /etc/sysconfig/jenkins
+    sudo mkdir -p /etc/systemd/system/jenkins.service.d
+    echo -e "[Service]\nEnvironment=\"JENKINS_PORT=$port\"" | \
+    sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null
     
     sudo systemctl daemon-reload > /dev/null
     sudo systemctl start jenkins > /dev/null
