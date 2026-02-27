@@ -114,3 +114,46 @@ initialAdminPassword=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 echo
 echo "Here is the Initial Admin Password: $initialAdminPassword"
 echo
+
+
+
+
+
+
+echo
+echo "Do you want to exit from this script? Or perform another operation?"
+echo "1) Exit"
+echo "2) Install Tomcat"
+echo "3) Install Maven"
+echo
+
+read -p "Enter your choice [1-3]: " choice
+
+case $choice in
+    1)
+        echo "Exiting script..."
+        exit 0
+        ;;
+    2)
+        echo "Installing Tomcat..."
+        cd
+        sudo yum install git -y > /dev/null 2>&1
+        rm -rf install_tomcat_RHEL_Ubuntu
+        git clone https://github.com/NagarajKamath/install_tomcat_RHEL_Ubuntu.git > /dev/null 2>&1
+        cd install_tomcat_RHEL_Ubuntu || exit
+        bash tomcat.sh
+        ;;
+    3)
+        echo "Installing Maven..."
+        cd
+        sudo yum install git -y > /dev/null 2>&1
+        rm -rf install_maven_RHEL_Ubuntu
+        git clone https://github.com/nagaraj602/install_maven_RHEL_Ubuntu.git > /dev/null 2>&1
+        cd install_maven_RHEL_Ubuntu || exit
+        bash maven.sh
+        ;;
+    *)
+        echo "Invalid option. Exiting."
+        exit 1
+        ;;
+esac
