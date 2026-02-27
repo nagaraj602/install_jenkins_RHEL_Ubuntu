@@ -28,6 +28,24 @@ done
 echo "Installing Jenkins on $distro"
 
 if [ "$distro" == "rhel" ]; then
+
+    # FULL RESET - Remove existing Jenkins completely
+    if systemctl list-unit-files | grep -q jenkins.service; then
+        sudo systemctl stop jenkins > /dev/null 2>&1
+    fi
+    
+    sudo yum remove jenkins -y > /dev/null 2>&1
+    
+    sudo rm -rf /var/lib/jenkins \
+                /var/log/jenkins \
+                /etc/systemd/system/jenkins.service.d \
+                /etc/yum.repos.d/jenkins.repo \
+                /usr/lib/systemd/system/jenkins.service \
+                /etc/sysconfig/jenkins > /dev/null 2>&1
+    
+    sudo systemctl daemon-reload > /dev/null 2>&1
+
+    
     sudo yum update -y > /dev/null
     sudo yum install wget -y > /dev/null
 
@@ -47,7 +65,26 @@ if [ "$distro" == "rhel" ]; then
     sudo systemctl start jenkins > /dev/null
 
 elif [ "$distro" == "ubuntu" ]; then
+
+    # FULL RESET - Remove existing Jenkins completely
+    if systemctl list-unit-files | grep -q jenkins.service; then
+        sudo systemctl stop jenkins > /dev/null 2>&1
+    fi
     
+    sudo apt purge jenkins -y > /dev/null 2>&1
+    sudo apt autoremove -y > /dev/null 2>&1
+    
+    sudo rm -rf /var/lib/jenkins \
+                /var/log/jenkins \
+                /etc/systemd/system/jenkins.service.d \
+                /etc/apt/sources.list.d/jenkins.list \
+                /etc/default/jenkins > /dev/null 2>&1
+    
+    sudo systemctl daemon-reload > /dev/null 2>&1
+    
+
+    sudo apt update -y > /dev/null
+    sudo apt install fontconfig openjdk-25-jre -y > /dev/null
     sudo apt install wget -y > /dev/null
 
     sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
@@ -57,8 +94,7 @@ elif [ "$distro" == "ubuntu" ]; then
     https://pkg.jenkins.io/debian-stable binary/" | \
     sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
     
-    sudo apt update -y > /dev/null
-    sudo apt install fontconfig openjdk-25-jre -y > /dev/null
+
     sudo apt install jenkins -y > /dev/null
     
     # Update Jenkins port BEFORE starting
