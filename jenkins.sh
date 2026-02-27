@@ -56,7 +56,8 @@ if [ "$distro" == "rhel" ]; then
     # Modern systemd override for port
     sudo mkdir -p /etc/systemd/system/jenkins.service.d
     echo -e "[Service]\nEnvironment=\"JENKINS_PORT=$port\"" | \
-    sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null
+    sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null 2>&1
+
 
     sudo systemctl daemon-reload > /dev/null
     sudo systemctl start jenkins > /dev/null
