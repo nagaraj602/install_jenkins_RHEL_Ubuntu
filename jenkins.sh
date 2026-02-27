@@ -95,14 +95,8 @@ elif [ "$distro" == "ubuntu" ]; then
     sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
     sudo apt-get install jenkins -y > /dev/null
 
-    # Modern systemd override for port (Ubuntu)
-    sudo mkdir -p /etc/systemd/system/jenkins.service.d
-    
-    sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null <<EOF
-    [Service]
-    ExecStart=
-    ExecStart=/usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/cache/jenkins/war --httpPort=$port
-EOF
+   sudo sed -i "s/^HTTP_PORT=.*/HTTP_PORT=$port/" /etc/default/jenkins
+    sudo systemctl restart jenkins > /dev/null
     
     sudo systemctl daemon-reload > /dev/null
     sudo systemctl start jenkins > /dev/null
