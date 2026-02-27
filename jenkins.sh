@@ -96,7 +96,7 @@ elif [ "$distro" == "ubuntu" ]; then
     [Service]
     ExecStart=
     ExecStart=/usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/cache/jenkins/war --httpPort=$port
-    EOF
+EOF
     
     sudo systemctl daemon-reload > /dev/null
     sudo systemctl start jenkins > /dev/null
