@@ -31,6 +31,8 @@ else
     done
 fi
 
+
+echo
 echo "Installing Jenkins on $distro"
 
 if [ "$distro" == "rhel" ]; then
