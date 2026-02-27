@@ -100,4 +100,4 @@ else
     exit 1
 fi
 
-echo "Access Jenkins at $(curl -s ifconfig.me):$port"
+echo "Access Jenkins at http://$(curl -s ifconfig.me):$port"
