@@ -102,9 +102,6 @@ fi
 
 echo "Access Jenkins at http://$(curl -s ifconfig.me):$port"
 
-while [ ! -f /var/lib/jenkins/secrets/initialAdminPassword ]; do
-    sleep 2
-done
 
 initialAdminPassword=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 
