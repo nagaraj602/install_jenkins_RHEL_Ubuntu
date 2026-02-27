@@ -76,7 +76,7 @@ elif [ "$distro" == "ubuntu" ]; then
     sudo systemctl daemon-reload > /dev/null 2>&1
 
     sudo apt update -y > /dev/null
-    sudo apt install wget -y > /dev/null
+    sudo apt-get install wget -y > /dev/null
 
     sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
     https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key > /dev/null 2>&1
@@ -86,8 +86,8 @@ elif [ "$distro" == "ubuntu" ]; then
     sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
 
     sudo apt update -y > /dev/null
-    sudo apt install fontconfig openjdk-25-jre -y > /dev/null
-    sudo apt install jenkins -y > /dev/null
+    sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
+    sudo apt-get install jenkins -y > /dev/null
 
     # Modern systemd override for port (Ubuntu)
     sudo mkdir -p /etc/systemd/system/jenkins.service.d
