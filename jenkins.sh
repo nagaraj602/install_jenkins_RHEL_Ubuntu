@@ -49,6 +49,7 @@ if [ "$distro" == "rhel" ]; then
     sudo systemctl daemon-reload > /dev/null 2>&1
 
     sudo yum update -y > /dev/null
+    sudo yum upgrade -y > /dev/null
     sudo yum install wget -y > /dev/null
 
     sudo wget -O /etc/yum.repos.d/jenkins.repo \
@@ -82,6 +83,7 @@ elif [ "$distro" == "ubuntu" ]; then
     sudo systemctl daemon-reload > /dev/null 2>&1
 
     sudo apt-get update -y > /dev/null
+    sudo apt-get upgrade -y > /dev/null
     sudo apt-get install wget -y > /dev/null
 
     sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
