@@ -66,6 +66,7 @@ if [ "$distro" == "rhel" ]; then
 
 
     sudo systemctl daemon-reload > /dev/null
+    sudo systemctl enable jenkins > /dev/null
     sudo systemctl start jenkins > /dev/null
 
 
@@ -101,6 +102,7 @@ elif [ "$distro" == "ubuntu" ]; then
     sudo systemctl restart jenkins > /dev/null
     
     sudo systemctl daemon-reload > /dev/null
+    sudo systemctl enable jenkins > /dev/null
     sudo systemctl start jenkins > /dev/null
 
 else
