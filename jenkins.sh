@@ -11,7 +11,11 @@ if [ -d "$JENKINS_DIR" ]; then
     if systemctl is-active --quiet jenkins; then
 
         if [ -f "$CONFIG_FILE" ]; then
-            configured_ip=$(grep -oP '(?<=<jenkinsUrl>http://)[^:/]+' "$CONFIG_FILE")
+            configured_ip=$(grep -oP '(?<=<jenkinsUrl>http://)[^:/]+' "$CONFIG_FILE" 2>/dev/null)
+
+            if [ -z "$configured_ip" ]; then
+                configured_ip="NOT_SET"
+            fi
 
             if [ "$current_ip" != "$configured_ip" ]; then
                 echo "1) Jenkins installation found and it is active running. But config file has old IP: $configured_ip, this would slow down the Jenkins, would you like to update the current IP: $current_ip in config file?"
@@ -20,7 +24,7 @@ if [ -d "$JENKINS_DIR" ]; then
 
                 case $opt in
                     1)
-                        sudo sed -i "s|http://$configured_ip|http://$current_ip|g" "$CONFIG_FILE"
+                        sudo sed -i "s|http://[^:]*|http://$current_ip|g" "$CONFIG_FILE"
                         sudo systemctl restart jenkins
                         exit 0
                         ;;
@@ -192,9 +196,6 @@ initialAdminPassword=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 echo
 echo "Here is the Initial Admin Password: $initialAdminPassword"
 echo
-
-
-
 
 
 
