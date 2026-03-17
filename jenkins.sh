@@ -57,7 +57,7 @@ if [ "$distro" == "rhel" ]; then
 
     sudo yum update -y > /dev/null
     sudo yum install fontconfig java-25-openjdk -y > /dev/null
-    sudo yum install jenkins -y > /dev/null
+    sudo yum install jenkins -y > /dev/null 2>&1
 
     # Modern systemd override for port
     sudo mkdir -p /etc/systemd/system/jenkins.service.d
