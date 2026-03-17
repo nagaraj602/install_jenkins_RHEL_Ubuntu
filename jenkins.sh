@@ -1,5 +1,75 @@
 #!/bin/bash
 
+
+JENKINS_DIR="/var/lib/jenkins"
+CONFIG_FILE="$JENKINS_DIR/jenkins.model.JenkinsLocationConfiguration.xml"
+
+if [ -d "$JENKINS_DIR" ]; then
+
+    current_ip=$(curl -s ifconfig.me)
+
+    if systemctl is-active --quiet jenkins; then
+
+        if [ -f "$CONFIG_FILE" ]; then
+            configured_ip=$(grep -oP '(?<=<jenkinsUrl>http://)[^:/]+' "$CONFIG_FILE")
+
+            if [ "$current_ip" != "$configured_ip" ]; then
+                echo "1) Jenkins installation found and it is active running. But config file has old IP: $configured_ip, this would slow down the Jenkins, would you like to update the current IP: $current_ip in config file?"
+                echo "2) Jenkins installation found, it shows as active running. Would you like to reinstall Jenkins?"
+                read -p "Choose [1-2]: " opt
+
+                case $opt in
+                    1)
+                        sudo sed -i "s|http://$configured_ip|http://$current_ip|g" "$CONFIG_FILE"
+                        sudo systemctl restart jenkins
+                        exit 0
+                        ;;
+                    2)
+                        echo "Reinstalling Jenkins..."
+                        ;;
+                    *)
+                        exit 0
+                        ;;
+                esac
+            else
+                echo "2) Jenkins installation found, it shows as active running. Would you like to reinstall Jenkins?"
+                read -p "Choose [2]: " opt
+                [ "$opt" = "2" ] || exit 0
+            fi
+        fi
+
+    else
+        echo "3) Jenkins installation found but not active running. You can try running \"sudo systemctl start jenkins\" to start Jenkins. Would you like me to run this for you?"
+        read -p "y/n: " opt
+
+        if [[ "$opt" == "y" ]]; then
+            sudo systemctl start jenkins
+
+            if ! systemctl is-active --quiet jenkins; then
+                echo "a) Jenkins didn't start. Would you like to investigate yourself?"
+                echo "b) Would you like to clean Jenkins installation and have fresh installation?"
+                read -p "Choose [a/b]: " subopt
+
+                case $subopt in
+                    a) exit 0 ;;
+                    b) echo "Cleaning and reinstalling Jenkins..." ;;
+                    *) exit 0 ;;
+                esac
+            else
+                exit 0
+            fi
+        else
+            exit 0
+        fi
+    fi
+
+    echo "4) Jenkins installation found. Would you like to clean it and have fresh installation now?"
+    read -p "y/n: " opt
+    [[ "$opt" == "y" ]] || exit 0
+fi
+
+
+
 distro=$(cat /etc/os-release | grep "^ID=" | cut -d "=" -f2 | sed 's/"//g')
 
 echo
