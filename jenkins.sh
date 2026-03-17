@@ -1,115 +1,5 @@
 #!/bin/bash
 
-
-JENKINS_DIR="/var/lib/jenkins"
-CONFIG_FILE="$JENKINS_DIR/jenkins.model.JenkinsLocationConfiguration.xml"
-
-if [ -d "$JENKINS_DIR" ]; then
-
-    current_ip=$(curl -s ifconfig.me)
-
-    if systemctl is-active --quiet jenkins; then
-
-        if [ -f "$CONFIG_FILE" ]; then
-            configured_ip=$(grep -oP '(?<=<jenkinsUrl>http://)[^:/]+' "$CONFIG_FILE" 2>/dev/null)
-
-            if [ -z "$configured_ip" ]; then
-                configured_ip="NOT_SET"
-            fi
-
-            if [ "$current_ip" != "$configured_ip" ]; then
-                echo "1) Jenkins installation found and it is active running. But config file has old IP: $configured_ip, this would slow down the Jenkins, would you like to update the current IP: $current_ip in config file?"
-                echo "2) Jenkins installation found, it shows as active running. Would you like to reinstall Jenkins?"
-                read -p "Choose [1-2]: " opt
-
-                case $opt in
-                    1)
-                        sudo sed -i "s|http://[^:]*|http://$current_ip|g" "$CONFIG_FILE"
-                        sudo systemctl restart jenkins
-
-                        # Detect port (Ubuntu + RHEL)
-                        jenkins_port=$(grep -Eo '[0-9]+' /etc/default/jenkins 2>/dev/null | head -1)
-                        if [ -z "$jenkins_port" ]; then
-                            jenkins_port=$(grep -Eo '[0-9]+' /etc/systemd/system/jenkins.service.d/override.conf 2>/dev/null | head -1)
-                        fi
-                        [ -z "$jenkins_port" ] && jenkins_port=8080
-
-                        echo "Updated the IP. You can access Jenkins at: http://$current_ip:$jenkins_port"
-                        exit 0
-                        ;;
-                    2)
-                        echo "Reinstalling Jenkins..."
-
-                        # FORCE REINSTALL IMMEDIATELY
-                        sudo systemctl stop jenkins > /dev/null 2>&1
-                        sudo yum remove jenkins -y > /dev/null 2>&1 || sudo apt-get purge jenkins -y &> /dev/null 2>&1
-
-                        break
-                        ;;
-                    *)
-                        exit 0
-                        ;;
-                esac
-            else
-                echo "2) Jenkins installation found, it shows as active running. Would you like to reinstall Jenkins?"
-                read -p "Choose [2]: " opt
-                if [ "$opt" = "2" ]; then
-                    echo "Reinstalling Jenkins..."
-
-                    sudo systemctl stop jenkins > /dev/null 2>&1
-                    sudo yum remove jenkins -y > /dev/null 2>&1 || sudo apt-get purge jenkins -y &> /dev/null 2>&1
-
-                    break
-                else
-                    exit 0
-                fi
-            fi
-        fi
-
-    else
-        echo "3) Jenkins installation found but not active running. You can try running \"sudo systemctl start jenkins\" to start Jenkins. Would you like me to run this for you?"
-        read -p "y/n: " opt
-
-        if [[ "$opt" == "y" ]]; then
-            sudo systemctl start jenkins
-
-            if ! systemctl is-active --quiet jenkins; then
-                echo "a) Jenkins didn't start. Would you like to investigate yourself?"
-                echo "b) Would you like to clean Jenkins installation and have fresh installation?"
-                read -p "Choose [a/b]: " subopt
-
-                case $subopt in
-                    a) exit 0 ;;
-                    b)
-                        echo "Cleaning and reinstalling Jenkins..."
-
-                        sudo systemctl stop jenkins > /dev/null 2>&1
-                        sudo yum remove jenkins -y > /dev/null 2>&1 || sudo apt-get purge jenkins -y &> /dev/null 2>&1
-
-                        break
-                        ;;
-                    *) exit 0 ;;
-                esac
-            else
-                exit 0
-            fi
-        else
-            exit 0
-        fi
-    fi
-
-    echo "4) Jenkins installation found. Would you like to clean it and have fresh installation now?"
-    read -p "y/n: " opt
-    if [[ "$opt" == "y" ]]; then
-        sudo systemctl stop jenkins > /dev/null 2>&1
-        sudo yum remove jenkins -y > /dev/null 2>&1 || sudo apt-get purge jenkins -y &> /dev/null 2>&1
-    else
-        exit 0
-    fi
-fi
-
-
-
 distro=$(cat /etc/os-release | grep "^ID=" | cut -d "=" -f2 | sed 's/"//g')
 
 echo
@@ -123,12 +13,14 @@ is_port_free() {
     ! ss -tuln | grep -q ":$1 "
 }
 
+# If user did NOT enter anything (timeout case)
 if [ -z "$port" ]; then
     port=8080
     while ! is_port_free "$port"; do
         port=$((port+1))
     done
 else
+    # If user entered a value, validate and re-ask if invalid/busy
     while ! [[ "$port" =~ ^[0-9]+$ ]] || \
           [ "$port" -lt 1 ] || \
           [ "$port" -gt 65535 ] || \
@@ -145,27 +37,54 @@ echo "Installing Jenkins on $distro"
 
 if [ "$distro" == "rhel" ]; then
 
+    # FULL RESET
+    sudo systemctl stop jenkins > /dev/null 2>&1
+    sudo yum remove jenkins -y > /dev/null 2>&1
+    sudo rm -rf /var/lib/jenkins \
+                /var/log/jenkins \
+                /etc/systemd/system/jenkins.service.d \
+                /etc/yum.repos.d/jenkins.repo \
+                /usr/lib/systemd/system/jenkins.service \
+                /etc/sysconfig/jenkins > /dev/null 2>&1
+    sudo systemctl daemon-reload > /dev/null 2>&1
+
     sudo yum update -y > /dev/null
+    sudo yum upgrade -y > /dev/null
     sudo yum install wget -y > /dev/null
 
     sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/rpm-stable/jenkins.repo > /dev/null 2>&1
 
+    sudo yum upgrade -y > /dev/null
     sudo yum install fontconfig java-25-openjdk -y > /dev/null
     sudo yum install jenkins -y > /dev/null
 
+    # Modern systemd override for port
     sudo mkdir -p /etc/systemd/system/jenkins.service.d
     echo -e "[Service]\nEnvironment=\"JENKINS_PORT=$port\"" | \
     sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null 2>&1
 
-    sudo systemctl daemon-reload > /dev/null 2>&1
-    sudo systemctl enable jenkins > /dev/null 2>&1
-    sudo systemctl start jenkins > /dev/null 2>&1
+
+    sudo systemctl daemon-reload > /dev/null
+    sudo systemctl enable jenkins > /dev/null
+    sudo systemctl start jenkins > /dev/null
 
 
 elif [ "$distro" == "ubuntu" ]; then
 
+    # FULL RESET
+    sudo systemctl stop jenkins > /dev/null 2>&1
+    sudo apt-get purge jenkins -y &> /dev/null 2>&1
+    sudo apt-get autoremove -y &> /dev/null 2>&1
+    sudo rm -rf /var/lib/jenkins \
+                /var/log/jenkins \
+                /etc/systemd/system/jenkins.service.d \
+                /etc/apt/sources.list.d/jenkins.list \
+                /etc/default/jenkins > /dev/null 2>&1
+    sudo systemctl daemon-reload > /dev/null 2>&1
+
     sudo apt-get update -y > /dev/null
+    sudo apt-get upgrade -y > /dev/null
     sudo apt-get install wget -y > /dev/null
 
     sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
@@ -179,8 +98,9 @@ elif [ "$distro" == "ubuntu" ]; then
     sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
     sudo apt-get install jenkins -y > /dev/null
 
-    sudo sed -i "s/^HTTP_PORT=.*/HTTP_PORT=$port/" /etc/default/jenkins
-
+   sudo sed -i "s/^HTTP_PORT=.*/HTTP_PORT=$port/" /etc/default/jenkins
+    sudo systemctl restart jenkins > /dev/null
+    
     sudo systemctl daemon-reload > /dev/null
     sudo systemctl enable jenkins > /dev/null
     sudo systemctl start jenkins > /dev/null
@@ -202,3 +122,46 @@ initialAdminPassword=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 echo
 echo "Here is the Initial Admin Password: $initialAdminPassword"
 echo
+
+
+
+
+
+
+echo
+echo "Do you want to exit from this script? Or perform another operation?"
+echo "1) Exit"
+echo "2) Install Tomcat"
+echo "3) Install Maven"
+echo
+
+read -p "Enter your choice [1-3]: " choice
+
+case $choice in
+    1)
+        echo "Exiting script..."
+        exit 0
+        ;;
+    2)
+        echo "Installing Tomcat..."
+        cd
+        sudo yum install git -y > /dev/null 2>&1
+        rm -rf install_tomcat_RHEL_Ubuntu
+        git clone https://github.com/nagaraj602/install_tomcat_RHEL_Ubuntu.git > /dev/null 2>&1
+        cd install_tomcat_RHEL_Ubuntu || exit
+        bash tomcat.sh
+        ;;
+    3)
+        echo "Installing Maven..."
+        cd
+        sudo yum install git -y > /dev/null 2>&1
+        rm -rf install_maven_RHEL_Ubuntu
+        git clone https://github.com/nagaraj602/install_maven_RHEL_Ubuntu.git > /dev/null 2>&1
+        cd install_maven_RHEL_Ubuntu || exit
+        bash maven.sh
+        ;;
+    *)
+        echo "Invalid option. Exiting."
+        exit 1
+        ;;
+esac
