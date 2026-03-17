@@ -26,6 +26,7 @@ if [ -d "$JENKINS_DIR" ]; then
                     1)
                         sudo sed -i "s|http://[^:]*|http://$current_ip|g" "$CONFIG_FILE"
                         sudo systemctl restart jenkins
+                        echo "Updated the IP. You can access Jenkins at: http://$current_ip:$port"
                         exit 0
                         ;;
                     2)
