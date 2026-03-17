@@ -65,9 +65,9 @@ if [ "$distro" == "rhel" ]; then
     sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null 2>&1
 
 
-    sudo systemctl daemon-reload > /dev/null
-    sudo systemctl enable jenkins > /dev/null
-    sudo systemctl start jenkins > /dev/null
+    sudo systemctl daemon-reload > /dev/null 2>&1
+    sudo systemctl enable jenkins > /dev/null 2>&1
+    sudo systemctl start jenkins > /dev/null 2>&1
 
 
 elif [ "$distro" == "ubuntu" ]; then
