@@ -55,7 +55,7 @@ if [ "$distro" == "rhel" ]; then
     sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/rpm-stable/jenkins.repo > /dev/null 2>&1
 
-    sudo yum upgrade -y > /dev/null
+    sudo yum update -y > /dev/null
     sudo yum install fontconfig java-25-openjdk -y > /dev/null
     sudo yum install jenkins -y > /dev/null
 
