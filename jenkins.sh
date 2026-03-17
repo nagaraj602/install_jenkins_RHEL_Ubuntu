@@ -65,8 +65,8 @@ if [ "$distro" == "rhel" ]; then
     sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null 2>&1
 
 
-    sudo systemctl daemon-reload > /dev/null
-    sudo systemctl enable jenkins > /dev/null
+    sudo systemctl daemon-reload > /dev/null 2>&1
+    sudo systemctl enable jenkins > /dev/null 2>&1
     sudo systemctl start jenkins > /dev/null
 
 
@@ -92,7 +92,7 @@ elif [ "$distro" == "ubuntu" ]; then
 
     echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] \
     https://pkg.jenkins.io/debian-stable binary/" | \
-    sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+    sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null 2>&1
 
     sudo apt-get update -y > /dev/null
     sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
@@ -101,8 +101,8 @@ elif [ "$distro" == "ubuntu" ]; then
    sudo sed -i "s/^HTTP_PORT=.*/HTTP_PORT=$port/" /etc/default/jenkins
     sudo systemctl restart jenkins > /dev/null
     
-    sudo systemctl daemon-reload > /dev/null
-    sudo systemctl enable jenkins > /dev/null
+    sudo systemctl daemon-reload > /dev/null 2>&1
+    sudo systemctl enable jenkins > /dev/null 2>&1
     sudo systemctl start jenkins > /dev/null
 
 else
