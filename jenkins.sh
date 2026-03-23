@@ -48,18 +48,18 @@ if [ "$distro" == "rhel" ]; then
                 /etc/sysconfig/jenkins > /dev/null 2>&1
     sudo systemctl daemon-reload > /dev/null 2>&1
 
-    sudo yum update -y > /dev/null
-    sudo yum install wget -y > /dev/null
+    sudo yum update -y > /dev/null 2>&1
+    sudo yum install wget -y > /dev/null 2>&1
 
     sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/rpm-stable/jenkins.repo > /dev/null 2>&1
 
-    sudo yum update -y > /dev/null
+    sudo yum update -y > /dev/null 2>&1
     sudo yum install fontconfig java-25-openjdk -y > /dev/null 2>&1
     sudo yum install jenkins -y > /dev/null 2>&1
 
     # Modern systemd override for port
-    sudo mkdir -p /etc/systemd/system/jenkins.service.d
+    sudo mkdir -p /etc/systemd/system/jenkins.service.d > /dev/null 2>&1
     echo -e "[Service]\nEnvironment=\"JENKINS_PORT=$port\"" | \
     sudo tee /etc/systemd/system/jenkins.service.d/override.conf > /dev/null 2>&1
 
