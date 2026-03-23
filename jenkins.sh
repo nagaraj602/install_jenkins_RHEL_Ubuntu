@@ -49,14 +49,13 @@ if [ "$distro" == "rhel" ]; then
     sudo systemctl daemon-reload > /dev/null 2>&1
 
     sudo yum update -y > /dev/null
-    sudo yum upgrade -y > /dev/null
     sudo yum install wget -y > /dev/null
 
     sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/rpm-stable/jenkins.repo > /dev/null 2>&1
 
     sudo yum update -y > /dev/null
-    sudo yum install fontconfig java-25-openjdk -y > /dev/null
+    sudo yum install fontconfig java-25-openjdk -y > /dev/null 2>&1
     sudo yum install jenkins -y > /dev/null 2>&1
 
     # Modern systemd override for port
@@ -67,7 +66,7 @@ if [ "$distro" == "rhel" ]; then
 
     sudo systemctl daemon-reload > /dev/null 2>&1
     sudo systemctl enable jenkins > /dev/null 2>&1
-    sudo systemctl start jenkins > /dev/null
+    sudo systemctl start jenkins > /dev/null 2>&1
 
 
 elif [ "$distro" == "ubuntu" ]; then
@@ -84,7 +83,6 @@ elif [ "$distro" == "ubuntu" ]; then
     sudo systemctl daemon-reload > /dev/null 2>&1
 
     sudo apt-get update -y > /dev/null
-    sudo apt-get upgrade -y > /dev/null
     sudo apt-get install wget -y > /dev/null
 
     sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
@@ -96,14 +94,14 @@ elif [ "$distro" == "ubuntu" ]; then
 
     sudo apt-get update -y > /dev/null
     sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
-    sudo apt-get install jenkins -y > /dev/null
+    sudo apt-get install jenkins -y > /dev/null 2>&1
 
-   sudo sed -i "s/^HTTP_PORT=.*/HTTP_PORT=$port/" /etc/default/jenkins
-    sudo systemctl restart jenkins > /dev/null
+    sudo sed -i "s/^HTTP_PORT=.*/HTTP_PORT=$port/" /etc/default/jenkins > /dev/null 2>&1
+    sudo systemctl restart jenkins > /dev/null 2>&1
     
     sudo systemctl daemon-reload > /dev/null 2>&1
     sudo systemctl enable jenkins > /dev/null 2>&1
-    sudo systemctl start jenkins > /dev/null
+    sudo systemctl start jenkins > /dev/null 2>&1
 
 else
     echo "Unsupported Distribution - Only RHEL and Ubuntu are supported by this Script!!!!"
