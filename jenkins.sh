@@ -82,8 +82,8 @@ elif [ "$distro" == "ubuntu" ]; then
                 /etc/default/jenkins > /dev/null 2>&1
     sudo systemctl daemon-reload > /dev/null 2>&1
 
-    sudo apt-get update -y > /dev/null
-    sudo apt-get install wget -y > /dev/null
+    sudo apt-get update -y > /dev/null 2>&1
+    sudo apt-get install wget -y > /dev/null 2>&1
 
     sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
     https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key > /dev/null 2>&1
@@ -92,8 +92,8 @@ elif [ "$distro" == "ubuntu" ]; then
     https://pkg.jenkins.io/debian-stable binary/" | \
     sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null 2>&1
 
-    sudo apt-get update -y > /dev/null
-    sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null
+    sudo apt-get update -y > /dev/null 2>&1
+    sudo apt-get install fontconfig openjdk-25-jre -y > /dev/null 2>&1
     sudo apt-get install jenkins -y > /dev/null 2>&1
 
     sudo sed -i "s/^HTTP_PORT=.*/HTTP_PORT=$port/" /etc/default/jenkins > /dev/null 2>&1
