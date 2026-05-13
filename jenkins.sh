@@ -55,7 +55,7 @@ if [ "$distro" == "rhel" ] || [ "$distro" == "amzn" ]; then
     https://pkg.jenkins.io/rpm-stable/jenkins.repo > /dev/null 2>&1
 
     sudo yum update -y > /dev/null 2>&1
-    sudo yum install fontconfig java-25-openjdk -y > /dev/null 2>&1
+    sudo yum install fontconfig java-25-openjdk java-25-amazon-corretto -y > /dev/null 2>&1
     sudo yum install jenkins -y > /dev/null 2>&1
 
     # Modern systemd override for port
