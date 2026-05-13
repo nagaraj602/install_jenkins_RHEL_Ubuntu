@@ -35,7 +35,7 @@ fi
 echo
 echo "Installing Jenkins on $distro"
 
-if [ "$distro" == "rhel" ]; then
+if [ "$distro" == "rhel" ] || [ "$distro" == "amzn" ]; then
 
     # FULL RESET
     sudo systemctl stop jenkins > /dev/null 2>&1
