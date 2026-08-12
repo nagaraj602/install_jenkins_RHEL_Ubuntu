@@ -109,9 +109,12 @@ else
     exit 1
 fi
 
-sudo gpasswd -a ubuntu docker > /dev/null 2>&1
-sudo gpasswd -a jenkins docker > /dev/null 2>&1
+sudo usermod -aG docker ubuntu > /dev/null 2>&1
+sudo usermod -aG docker jenkins > /dev/null 2>&1
 newgrp docker
+sudo systemctl restart jenkins
+
+
 
 echo "*******************************************************"
 echo
